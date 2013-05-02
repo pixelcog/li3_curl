@@ -549,7 +549,7 @@ class Curl extends \lithium\net\socket\Curl {
 		if (is_resource($this->_resource) && static::queued($this)) {
 			static::dequeue($this);
 		}
-		parent::write($data);
+		return parent::write($data);
 	}
 
 	/**
