@@ -564,7 +564,7 @@ class Curl extends \lithium\net\socket\Curl {
 			return false;
 		}
 		static::enqueue($this, array_filter(compact('callback')));
-		return true;
+		return $this;
 	}
 
 	/**
