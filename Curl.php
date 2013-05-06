@@ -314,6 +314,7 @@ class Curl extends \lithium\net\socket\Curl {
 	protected static function _refresh(array $options = array()) {
 		$defaults = array('clean' => true);
 		$options += $defaults;
+		$continue = false;
 
 		if (empty(static::$_active) && empty(static::$_queue)) {
 			static::_closeStack();
@@ -329,7 +330,7 @@ class Curl extends \lithium\net\socket\Curl {
 			$message = 'Curl Stack Error from `curl_multi_exec()` (Code ' . intval($status) . ')';
 			throw new CurlStackException($message);
 		}
-		if ($options['clean']) {
+		if ($options['clean'] || !$running) {
 			while ($finished = curl_multi_info_read($handle)) {
 				if ($finished['msg'] !== CURLMSG_DONE) {
 					$message = 'Unexpected Response ' . intval($ready['msg']) . ' from `curl_multi_info_read()`';
@@ -340,6 +341,7 @@ class Curl extends \lithium\net\socket\Curl {
 					'status' => static::STATUS_FINISHED
 				);
 				static::_finish($finished['handle'], $result);
+				$continue = true;
 			}
 			$now = microtime(true);
 
@@ -354,11 +356,11 @@ class Curl extends \lithium\net\socket\Curl {
 						'status' => static::STATUS_EXPIRED
 					);
 					static::_finish($resource, $result);
+					$continue = true;
 				}
 			}
-			$running = static::_refresh(array('clean' => false));
 		}
-		return $running;
+		return $continue ? static::_refresh() : $running;
 	}
 
 	/**
