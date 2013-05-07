@@ -563,7 +563,8 @@ class Curl extends \lithium\net\socket\Curl {
 		if (!is_resource($this->_resource)) {
 			return false;
 		}
-		static::enqueue($this, array_filter(compact('callback')));
+		$timeout = $this->_config['timeout'];
+		static::enqueue($this, array_filter(compact('callback', 'timeout')));
 		return $this;
 	}
 
